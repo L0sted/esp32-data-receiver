@@ -1,30 +1,39 @@
 #!/bin/python
 # -*- coding: utf8 -*-
+import socket, json, time
 print("\thi! receiver started!")
 
-import socket, json
-sock = socket.socket()
-sock.bind(('', 8081))
-sock.listen(5)
-conn, addr = sock.accept()
-
+values = dict()
+#open
 try:
     with open("stored_values.json", "r") as read_file:
-        values = json.load(read_file)
+        values.update(json.load(read_file))
 except BaseException:
     print("\tempty or no file!")
-    values = []
 
-print("new client:", addr)
+sock = socket.socket()
+sock.bind(('', 8082))
+sock.listen(5)
+
 while True:
-    data = conn.recv(1024)
-    if not data:
-        break
-    print("RECEIVED: ",data, "FORMATTED:", float(data.decode()))
-    values.append(float(data.decode()))
+    conn, addr = sock.accept()
+    print("\nnew client:", addr)
+    #read socket
+    while True:
+        data = conn.recv(1024)
+        if not data:
+            break
+        # print("RECEIVED: ",data, "FORMATTED:", float(data.decode()))
+        #push vars to storage
+        payload = json.loads(data.decode())
+        values[time.ctime()] = {
+            "temp": float(payload[0]),
+            "humid": float(payload[1])
+            }
 
-conn.close()
-print("writing...")
-with open("stored_values.json", "w") as read_file:
-    json.dump(values, read_file)
-print("written successfully!\n\tbye")
+    #close and save
+    conn.close()
+    print("writing...", payload)
+    with open("stored_values.json", "w") as read_file:
+        json.dump(values, read_file)
+    print("written successfully!\n")
