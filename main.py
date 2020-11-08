@@ -36,5 +36,5 @@ while True:
     conn.close()
     print("writing...", payload)
     with open("stored_values.json", "w") as read_file:
-        json.dump(values, read_file)
+        json.dump(values, read_file, sort_keys = True, indent = 4, ensure_ascii = False)
     print("written successfully!\n")
