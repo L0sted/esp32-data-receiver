@@ -28,7 +28,8 @@ while True:
         payload = json.loads(data.decode())
         values[time.ctime()] = {
             "temp": float(payload[0]),
-            "humid": float(payload[1])
+            "humid": float(payload[1]),
+            "flower": float(payload[2])
             }
 
     #close and save
